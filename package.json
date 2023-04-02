@@ -7,17 +7,7 @@
     "prettier": "npx prettier --write ./src",
     "clean": "rm -rf dist",
     "build": "webpack",
-    "setup:browserLambda": "(cd dist/browserLambda && npm i)",
-    "setup:skillLambda": "(cd dist/skillLambda && npm i)",
-    "setup": "node bin/copyDependencies && run-p setup:browserLambda",
-    "package:browserLambda": "(cd dist/browserLambda && zip -r \"$OLDPWD/dist/browserLambda.zip\" .)",
-    "package:skillLambda": "(cd dist/skillLambda && zip -r \"$OLDPWD/dist/skillLambda.zip\" .)",
-    "package": "run-p package:browserLambda",
-    "deploy:browserLambda": "aws s3 cp dist/browserLambda.zip s3://safeway-lambdas --profile personal",
-    "deploy:skillLambda": "aws s3 cp dist/skillLambda.zip s3://safeway-lambdas --profile personal",
-    "update:browserLambda": "aws lambda update-function-code --function-name SafewayBrowser --s3-bucket safeway-lambdas --s3-key browserLambda.zip --profile personal",
-    "update:skillLambda": "aws lambda update-function-code --function-name SafewayCartSkill --s3-bucket safeway-lambdas --s3-key skillLambda.zip --profile personal",
-    "deploy": "run-s build setup package && run-p deploy:browserLambda && run-p update:browserLambda"
+    "deploy": "./bin/deploy.sh"
   },
   "author": "ventinus",
   "license": "MIT",

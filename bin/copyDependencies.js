@@ -7,7 +7,7 @@ const package = { name, version, dependencies };
 
 const destinations = [
   { name: "browserLambda", deny: ["ask-sdk-core"] },
-  // { name: "skillLambda", deny: ["chrome-aws-lambda", "puppeteer-core"] },
+  { name: "skillLambda", deny: ["chrome-aws-lambda", "puppeteer-core"] },
 ];
 
 destinations.forEach(({ name, deny }) => {

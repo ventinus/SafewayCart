@@ -8,7 +8,7 @@ module.exports = {
   },
   entry: {
     browserLambda: path.resolve(__dirname, "./src/browserLambda.js"),
-    // skillLambda: path.resolve(__dirname, "./src/skillLambda.js"),
+    skillLambda: path.resolve(__dirname, "./src/skillLambda.js"),
   },
   output: {
     path: path.resolve(__dirname, "./dist"),
