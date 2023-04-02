@@ -8,10 +8,10 @@ LAMBDA_NAME[1]="SafewayCartSkill"
 
 BUCKET="safeway-lambdas"
 PROFILE="personal"
+LENGTH=${#LAMBDA_CODE[@]}
 
 # build lambda code bundles with dependencies
-npm run clean
-npm run build
+npm-run-all clean build
 node bin/copyDependencies
 
 deploy () {
@@ -24,5 +24,6 @@ deploy () {
   aws lambda update-function-code --function-name $NAME --s3-bucket $BUCKET --s3-key $CODE.zip --profile $PROFILE
 }
 
-for i in {0..1}; do deploy "$i" & done
-wait
+for (( i=0; i<$LENGTH; i++)) do deploy "$i" & done; wait
+
+echo "Deployment successful"
