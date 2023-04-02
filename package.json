@@ -1,0 +1,55 @@
+{
+  "name": "@ventinus/safeway",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "jest",
+    "prettier": "npx prettier --write ./src",
+    "clean": "rm -rf dist",
+    "build": "webpack",
+    "setup:browserLambda": "(cd dist/browserLambda && npm i)",
+    "setup:skillLambda": "(cd dist/skillLambda && npm i)",
+    "setup": "node bin/copyDependencies && run-p setup:browserLambda",
+    "package:browserLambda": "(cd dist/browserLambda && zip -r \"$OLDPWD/dist/browserLambda.zip\" .)",
+    "package:skillLambda": "(cd dist/skillLambda && zip -r \"$OLDPWD/dist/skillLambda.zip\" .)",
+    "package": "run-p package:browserLambda",
+    "deploy:browserLambda": "aws s3 cp dist/browserLambda.zip s3://safeway-lambdas --profile personal",
+    "deploy:skillLambda": "aws s3 cp dist/skillLambda.zip s3://safeway-lambdas --profile personal",
+    "update:browserLambda": "aws lambda update-function-code --function-name SafewayBrowser --s3-bucket safeway-lambdas --s3-key browserLambda.zip --profile personal",
+    "update:skillLambda": "aws lambda update-function-code --function-name SafewayCartSkill --s3-bucket safeway-lambdas --s3-key skillLambda.zip --profile personal",
+    "deploy": "run-s build setup package && run-p deploy:browserLambda && run-p update:browserLambda"
+  },
+  "author": "ventinus",
+  "license": "MIT",
+  "dependencies": {
+    "ask-sdk-core": "^2.12.1",
+    "chrome-aws-lambda": "^10.1.0",
+    "node-fetch": "^2.6.9",
+    "puppeteer-core": "^10.4.0"
+  },
+  "devDependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.303.0",
+    "@aws-sdk/credential-providers": "^3.303.0",
+    "@babel/core": "^7.21.4",
+    "@babel/preset-env": "^7.21.4",
+    "aws-sdk": "^2.1348.0",
+    "babel-jest": "^29.5.0",
+    "babel-loader": "^9.1.2",
+    "jest": "^29.5.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.8.7",
+    "puppeteer": "^19.8.2",
+    "webpack": "^5.77.0",
+    "webpack-cli": "^5.0.1"
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ]
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "^@/(.*)": "<rootDir>/src/$1"
+    }
+  }
+}
