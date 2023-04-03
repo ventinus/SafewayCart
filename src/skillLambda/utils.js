@@ -7,3 +7,12 @@ export const findItem = (inventory, { name }) => {
     );
   });
 };
+
+export const parseCookies = (response) =>
+  response.headers
+    .raw()
+    ["set-cookie"].map((entry) => {
+      const parts = entry.split(";");
+      return parts[0];
+    })
+    .join(";");

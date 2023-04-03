@@ -7,8 +7,8 @@ module.exports = {
     "aws-sdk": "aws-sdk",
   },
   entry: {
-    browserLambda: path.resolve(__dirname, "./src/browserLambda.js"),
-    skillLambda: path.resolve(__dirname, "./src/skillLambda.js"),
+    browserLambda: path.resolve(__dirname, "./src/browserLambda/index.js"),
+    skillLambda: path.resolve(__dirname, "./src/skillLambda/index.js"),
   },
   output: {
     path: path.resolve(__dirname, "./dist"),

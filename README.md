@@ -21,7 +21,13 @@ I haven't gone through the CDK configuration I normally would (will invest in it
    1. Add the lambda environment key `Bucket` with the name of the new S3 bucket (i.e. `safeway-lambdas`)
    1. Update Memory to 1024 MB
    1. Update Timeout to 30 sec (I currently experience duration to be around 20 seconds)
+   1. Set the source to the appropriate S3 object URI in your bucket
 1. Create a lambda to be the Alexa skill runtime lambda. This is what is run when you invoke your skill through Alexa. I named mine `SafewayCartSkill`
+   1. Grant the lambda execution role to have access to invoke the browser lambda
+   1. Grant the lambda execution role to have access to retrieve secrets from SecretsManager (TODO: not working yet)
+   1. set the env variable `BrowserLambdaArn` to be the arn of your browser lambda
+   1. Add an Alexa trigger
+   1. Set the source to the appropriate S3 object URI in your bucket
 
 ## Developer workflow
 
@@ -36,3 +42,10 @@ I haven't gone through the CDK configuration I normally would (will invest in it
 
 - upgrade puppeteer lambda nodejs version to latest (v18)
   - when on v18+, upgrade `aws-sdk` to `@aws-sdk` v3
+- add check for item in cart when adding it, respond accordingly
+- add ability to remove an item
+- add ability to add multiple items
+- add ability to read out the cart
+- improve item search to return multiple possible matches
+- write tests for skillLambda
+- write tests for the rest
