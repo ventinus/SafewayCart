@@ -1,4 +1,3 @@
-import AWS from "aws-sdk";
 import fetch from "node-fetch";
 
 import { parseCookies } from "@/skillLambda/utils";
@@ -20,31 +19,13 @@ const getCookie = async (credentials) => {
     body: JSON.stringify(credentials),
   });
 
-  const cookie = parseCookies(response);
   const { status } = await response.json();
 
   if (status !== "SUCCESS") {
     throw new Error(`Error logging in with status: ${status}`);
   }
 
-  return cookie;
-};
-
-const fetchJwtToken = async (credentials) => {
-  const { BrowserLambdaArn } = process.env;
-  const browserLambdaName = BrowserLambdaArn.split(":").reverse()[0];
-  const lambdaClient = new AWS.Lambda();
-  const params = {
-    FunctionName: browserLambdaName,
-    InvocationType: "RequestResponse",
-    Payload: JSON.stringify({ action: "getJwtToken", params: credentials }),
-  };
-  const response = await lambdaClient.invoke(params).promise();
-  const { statusCode, body } = JSON.parse(response.Payload);
-  if (statusCode !== 200) {
-    throw new Error(`fetchJwtToken failed with status ${statusCode}`);
-  }
-  return body;
+  return parseCookies(response);
 };
 
 // also available: rewaredsProgramId (not currently used)
@@ -53,6 +34,7 @@ export const api = async ({
   cartSubKey,
   houseId,
   zipCode,
+  jwtToken,
   locationId: storeId,
   ...creds
 }) => {
@@ -85,11 +67,7 @@ export const api = async ({
     )}`,
   };
 
-  const [cookie, jwtToken] = await Promise.all([
-    getCookie(creds),
-    fetchJwtToken(creds),
-  ]);
-  console.log(cookie, jwtToken, subKey, cartSubKey, houseId, zipCode, storeId);
+  const cookie = await getCookie(creds);
 
   const request = async (
     url,

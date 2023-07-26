@@ -5,9 +5,7 @@
  * */
 const Alexa = require("ask-sdk-core");
 
-import { SafewayClient } from "@/skillLambda/SafewayClient";
-
-let client = new SafewayClient().init();
+import { safewayClient } from "@/skillLambda/SafewayClient";
 
 const LaunchRequestHandler = {
   canHandle(handlerInput) {
@@ -34,7 +32,7 @@ const AddToCartIntentHandler = {
     );
   },
   async handle(handlerInput) {
-    client = await client;
+    const client = await safewayClient;
 
     const { name, quantity } =
       handlerInput.requestEnvelope.request.intent.slots;

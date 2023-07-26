@@ -5,6 +5,8 @@ module.exports = {
   externals: {
     "chrome-aws-lambda": "chrome-aws-lambda",
     "aws-sdk": "aws-sdk",
+    "puppeteer-extra": "puppeteer-extra",
+    "puppeteer-extra-plugin-stealth": "puppeteer-extra-plugin-stealth",
   },
   entry: {
     browserLambda: path.resolve(__dirname, "./src/browserLambda/index.js"),

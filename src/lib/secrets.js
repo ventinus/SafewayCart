@@ -3,21 +3,26 @@
 //   SecretsManagerClient,
 //   GetSecretValueCommand,
 // } from "@aws-sdk/client-secrets-manager";
+
 import AWS from "aws-sdk";
 
 const SecretId = "SafewayCreds";
+const client = new AWS.SecretsManager({
+  apiVersion: "2017-10-17",
+  region: "us-west-2",
+});
 
+let secrets;
 /**
  *
- * @param {*} awsTokens
- * @returns { username, password, locationId, zipCode, subKey, cartSubKey, rewardsProgramId }
+ * @returns { username, password, locationId, zipCode, subKey, cartSubKey, rewardsProgramId, jwtToken }
  */
-export const getSecrets = async (awsTokens) => {
-  const client = new AWS.SecretsManager({
-    apiVersion: "2017-10-17",
-    region: "us-west-2",
-    credentials: awsTokens,
-  });
+export const getSecrets = async () => {
+  if (secrets) {
+    console.log("returning cached secrets");
+    return secrets;
+  }
+
   // const client = new SecretsManagerClient({
   //   region: "us-west-2",
   //   credentials: awsTokens,
@@ -36,5 +41,17 @@ export const getSecrets = async (awsTokens) => {
   //   throw error;
   // }
 
-  return JSON.parse(response.SecretString);
+  secrets = JSON.parse(response.SecretString);
+  return secrets;
+};
+
+export const updateJwtToken = async (jwtToken) => {
+  secrets = { ...(await getSecrets()), jwtToken: `Bearer ${jwtToken}` };
+  await client
+    .updateSecret({
+      SecretId,
+      SecretString: JSON.stringify(secrets),
+    })
+    .promise();
+  return secrets;
 };

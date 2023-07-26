@@ -1,36 +1,60 @@
 import { getSecrets } from "@/lib/secrets";
-import { api } from "@/skillLambda/api";
+import { api as apiGenerator } from "@/skillLambda/api";
 import { findItem } from "@/skillLambda/utils";
 
-export class SafewayClient {
-  constructor() {
-    this.api = undefined;
-  }
+export const safewayClient = (async () => {
+  const api = await apiGenerator(await getSecrets());
 
-  async init() {
-    console.log("calling init");
-    if (!this.api) {
-      this.api = await api(await getSecrets());
-    }
+  return {
+    addItemToCart: async ({ name, quantity = 1 }) => {
+      console.log(`adding ${quantity} ${name} to cart`);
+      const purchases = await api.getPurchaseHistory();
+      const item = findItem(purchases, { name });
 
-    return this;
-  }
+      if (!item) {
+        throw new Error(
+          `could not find item ${name} amidst previous purchases ${JSON.stringify(
+            purchases,
+            null,
+            2
+          )}`
+        );
+      }
 
-  async addItemToCart({ name, quantity = 1 }) {
-    console.log(`adding ${quantity} ${name} to cart`);
-    const purchases = await this.api.getPurchaseHistory();
-    const item = findItem(purchases, { name });
+      return api.addItemToCart({ itemId: item.id, quantity });
+    },
+  };
+})();
 
-    if (!item) {
-      throw new Error(
-        `could not find item ${name} amidst previous purchases ${JSON.stringify(
-          purchases,
-          null,
-          2
-        )}`
-      );
-    }
+// export class SafewayClient {
+//   constructor() {
+//     this.api = undefined;
+//   }
 
-    return this.api.addItemToCart({ itemId: item.id, quantity });
-  }
-}
+//   async init() {
+//     console.log("calling init");
+//     if (!this.api) {
+//       this.api = await api(await getSecrets());
+//     }
+
+//     return this;
+//   }
+
+//   async addItemToCart({ name, quantity = 1 }) {
+//     console.log(`adding ${quantity} ${name} to cart`);
+//     const purchases = await this.api.getPurchaseHistory();
+//     const item = findItem(purchases, { name });
+
+//     if (!item) {
+//       throw new Error(
+//         `could not find item ${name} amidst previous purchases ${JSON.stringify(
+//           purchases,
+//           null,
+//           2
+//         )}`
+//       );
+//     }
+
+//     return this.api.addItemToCart({ itemId: item.id, quantity });
+//   }
+// }

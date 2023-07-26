@@ -1,19 +1,18 @@
-import { Browser } from "./Browser";
-
-let browser = new Browser().init();
+import { browserWrapper } from "./browserWrapper";
+import { getSecrets, updateJwtToken } from "@/lib/secrets";
 
 const ACTIONS = {
   getJwtToken: async ({ username, password }) => {
-    browser = await browser;
+    const browser = await browserWrapper;
     await browser.page.goto("https://safeway.com");
 
-    try {
-      await browser.click("button.unsupported-browser-button", {
-        maxAttempts: 3,
-      });
-    } catch (_) {
-      /* ok if button isn't there */
-    }
+    // try {
+    //   await browser.click("button.unsupported-browser-button", {
+    //     maxAttempts: 3,
+    //   });
+    // } catch (_) {
+    //   /* ok if button isn't there */
+    // }
 
     await browser.click('a[title="Your profile"]');
     await browser.click("#sign-in-modal-link");
@@ -32,24 +31,32 @@ const ACTIONS = {
     });
     const token = JSON.parse(decodeURIComponent(tokenCookie.value)).accessToken;
 
-    await browser.close();
-
-    return `Bearer ${token}`;
+    await Promise.all([browser.close(), updateJwtToken(token)]);
   },
 };
 
 export const handler = async (event) => {
+  const timeoutId = setTimeout(() => {
+    browserWrapper.then(async (browser) => {
+      await browser.logDom();
+      await browser.screenshot({ filename: `${event.action}-timeout` });
+    });
+  }, 28000);
   const action = ACTIONS[event.action];
 
   if (!action) {
+    clearTimeout(timeoutId);
     return {
       statusCode: 404,
       body: `Action ${event.action} does not exist`,
     };
   }
 
-  const response = await action(event.params);
+  const { username, password } = await getSecrets();
 
+  const response = await action({ username, password });
+
+  clearTimeout(timeoutId);
   return {
     statusCode: 200,
     body: response,
